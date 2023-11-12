@@ -1,0 +1,57 @@
+version: "3"
+
+services:
+  flask_app:
+    container_name: flask_app
+    build: ./app
+    command: gunicorn --bind 0.0.0.0:5001 app:app
+    ports:
+      - "5001:5001"
+    links:
+      - redis
+    environment:
+      - FLASK_APP=${FLASK_APP}
+      - FLASK_DEBUG=${FLASK_DEBUG}
+      - FLASK_ENV=${FLASK_ENV}
+      - TOKEN_SALT=${TOKEN_SALT}
+      - BLOCKFROST_IPFS=${BLOCKFROST_IPFS}
+      - NEW_RELIC_ENVIRONMENT=${NEW_RELIC_ENVIRONMENT}
+      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
+      - NEW_RELIC_LABELS=${NEW_RELIC_LABELS}      
+    volumes:
+      - ./app:/app
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    hostname: redis
+
+  nginx:
+      image: nginx:latest
+      hostname: nginx
+      depends_on:
+        - flask_app
+      ports:
+          - 80:80
+      volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+
+  celery:
+    build:
+      context: ./app
+    hostname: celery
+    entrypoint: celery
+    command: -A pinning_lab.celery worker --loglevel=info
+    links:
+      - redis
+    environment:
+      - FLASK_APP=${FLASK_APP}
+      - FLASK_DEBUG=${FLASK_DEBUG}
+      - FLASK_ENV=${FLASK_ENV}
+      - TOKEN_SALT=${TOKEN_SALT}
+      - BLOCKFROST_IPFS=${BLOCKFROST_IPFS}
+      - NEW_RELIC_ENVIRONMENT=${NEW_RELIC_ENVIRONMENT}
+      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
+      - NEW_RELIC_LABELS=${NEW_RELIC_LABELS}
+    volumes:
+      - ./app:/app

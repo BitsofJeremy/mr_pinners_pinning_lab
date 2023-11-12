@@ -1,0 +1,102 @@
+<!-- templates/profile.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3 class="title is-1">
+  Howdy, {{ username }}, here are your current pins.
+</h3>
+
+<div class="columns is-mobile is-multiline is-centered">
+{% if images %}
+{% for image in images %}
+    <div class="column is-narrow">
+    <div class="card">
+  <div class="card-image">
+    <figure class="image is-square">
+           <!--      TODO pull from IPFS gateway-->
+          <a href="https://ipfs.io/ipfs/{{ image.ipfs_hash}}">
+          <img src="https://ipfs.io/ipfs/{{ image.ipfs_hash}}" alt="image">
+            </a>
+    </figure>
+  </div>
+  <div class="card-content">
+      <div class="content">
+            <strong>
+                Name:
+            </strong>
+            <p>
+                {{ image.name }}
+            </p>
+      </div>
+    <div class="content">
+            <strong>
+                Description:
+            </strong>
+            <p>
+               {{ image.description }}
+            </p>
+      <br/>
+            <!--      TODO pull from IPFS gateway-->
+            <strong>IPFS Hash: </strong>
+            <a href="https://ipfs.io/ipfs/{{ image.ipfs_hash}}">
+              <p>{{ image.ipfs_hash}}</p>
+            </a>
+        <br/>
+        <strong>
+            Created:
+        </strong>
+        <p>
+         <time datetime="2016-1-1">
+             {{ image.date_created }}
+         </time>
+        </p>
+        <!-- Social Sharing -->
+
+        <div class="box">
+          <strong>
+            Share it:
+          </strong>
+          <br/>
+          <p>
+            <!-- Add more Social Buttons here: -->
+
+            <!-- Twitter -->
+          <a class="button is-small is-twitter" href="https://twitter.com/intent/tweet?url=https://ipfs.io/ipfs/{{ image.ipfs_hash}}&text=Name&via=bikemonkeytech" target="_blank" rel="nofollow">
+            <span class="icon">
+              <i class="fab fa-twitter fa-lg"></i>
+            </span>
+          </a>
+
+          <!-- Telegram -->
+          <a class="button is-small is-telegram" href="https://telegram.me/share/url?url=https://ipfs.io/ipfs/{{ image.ipfs_hash}}&text=Name" target="_blank" rel="nofollow">
+            <span class="icon">
+              <i class="fab fa-telegram fa-lg"></i>
+            </span>
+          </a>
+
+        </p>
+        </div>
+
+
+
+
+
+
+        <a href="./delete_pin/{{ image.id }}">
+            <button class="button is-block is-danger is-outlined is-small is-fullwidth">Remove Pin</button>
+        </a>
+    </div>
+  </div>
+</div>
+<br/>
+    </div>
+{% endfor %}
+{% else %}
+    <div class="box">No Pins at this time.</div>
+    {% endif %}
+
+    </div>
+
+{% endblock %}
